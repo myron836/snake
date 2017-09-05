@@ -23,36 +23,39 @@ var down = 83;
 var head = snakeBody[snakeBody.length - 1];
 createPiece(head)
 
-window.onkeydown = function (e) {
-    //followBody();
+window.onkeydown = function (e,index) {
     var head = snakeBody[snakeBody.length - 1];
-    if(e.keyCode == right && head[1] < 11)
+    if(e.keyCode == right)
     {
         head[1] += 1;
-        console.log('Right 1');
     } 
-    else if(e.keyCode == left && head[1] > 0) 
+    else if(e.keyCode == left) 
     {
         head[1] -= 1;
-        console.log('Left 1');
     }
-    else if(e.keyCode == up && head[0] > 0)
+    else if(e.keyCode == up)
     {
         head[0] -= 1;
-        console.log('Up 1');
     }
-    else if(e.keyCode == down && head[0] < 11) 
+    else if(e.keyCode == down) 
     {
         head[0] += 1;
-        console.log('Down 1');
+    }
+    else{
+        return;
     }
     console.log('Head Is At ' + head[0] + ' ' + head[1])
     // game logic
     foodRandom(head);
     followBody(head);
+    headOutBounds(head);
+
+    for (var index = 0; index < snakeBody.length; index++) {
+        resetGame(head,index);
+    } 
 
     // rendering
-    renderSnake(snakeBody);
+    renderSnake(snakeBody,head);   
 }
 
 function createPiece (bodyPiece) {
@@ -65,8 +68,8 @@ function createPiece (bodyPiece) {
     
 }
 
-function foodRandom(head) {
-    if (head[0] === foodPosition[0] && head[1] === foodPosition[1]) { 
+function foodRandom(head,index) {
+    if (head[0] === foodPosition[0] && head[1] === foodPosition[1]){ 
         foodPosition[0] = Math.floor(Math.random() * cellCanvas);
         foodPosition[1] = Math.floor(Math.random() * cellCanvas);
         food.style.top = foodPosition[0] * cellSize + 'px';
@@ -75,20 +78,49 @@ function foodRandom(head) {
     }     
 }
 
-/*var arrayLength = 1; arrayLength < snakeBody.length; arrayLength++*/
-
 function followBody(head) {
     for (var index = 1; index < snakeBody.length; index++) {
-        console.log('working?');
 
         snakeBody[index-1][0] = snakeBody[index][0];
         snakeBody[index-1][1] = snakeBody[index][1];
     }
 }
 
-function renderSnake(snakeBody) {
+function renderSnake(snakeBody,head) {
     for (var index = 0; index < snakeBody.length; index++) {
-        snakeBody[index][2].style.left = snakeBody[index][1]* cellSize + 'px';
-        snakeBody[index][2].style.top = snakeBody[index][0]* cellSize + 'px'; 
+        snakeBody[index][2].style.left = snakeBody[index][1] * cellSize + 'px';
+        snakeBody[index][2].style.top = snakeBody[index][0] * cellSize + 'px';
+        resetGame(head,index);
+    }
+}
+
+function resetGame(head,index) {
+    if (index >= snakeBody.length-2) {
+        return
+    }
+
+    if (head[0] === snakeBody[index][0] && head[1] === snakeBody[index][1]) {
+        console.log("died");
+        var deleteSnakeBody = document.getElementsByClassName("bodyPiece");
+        while(deleteSnakeBody.length > 0) {
+            deleteSnakeBody[0].parentNode.removeChild(deleteSnakeBody[0]);
+        }
+        snakeBody = [[0,0,snakeHead]];
+        createPiece(head)
+    }
+}
+
+function headOutBounds(head) {
+    if(head[0] > 11 || head[0] < 0 || head[1] > 11 || head[1] < 0) {
+        console.log("died");
+        var deleteSnakeBody = document.getElementsByClassName("bodyPiece");
+        while(deleteSnakeBody.length > 0) {
+            deleteSnakeBody[0].parentNode.removeChild(deleteSnakeBody[0]);
+        }
+        snakeBody = [[0,0,snakeHead]];
+        createPiece(head)
+    }
+    else{
+        return
     }
 }
