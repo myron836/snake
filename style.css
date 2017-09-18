@@ -25,7 +25,7 @@ body {
 }
 
 .food {
-    background-color: #AF4242;
+    background-color: rgb(199, 243, 255);
     width: 20px;
     height: 20px;
     position: absolute;
